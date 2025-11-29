@@ -13,8 +13,8 @@ fn main() -> std::io::Result<()> {
         if go {
             writeln!(file, "{l}")?;
         }
-        if let Some((_, b2)) = l.split_once("rice[[")
-            && let Some((b, _)) = b2.rsplit_once("]]rice")
+        if let Some((_, b2)) = l.split_once("[[")
+            && let Some((b, _)) = b2.rsplit_once("]]")
         {
             let b = b.trim();
             match &*b {
