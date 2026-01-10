@@ -1,13 +1,14 @@
 # rice
 
 ## Description
-Project rice
+"Splice dependency or AI agent files". A CLI tool (`rice`) to easily install components/dependencies.
 
 ## Goals
-- [ ] Add project goals
+- [ ] Simplify dependency installation
+- [ ] Manage "splicing" of components
 
 ## Progress
-- [ ] Initial setup
+- [ ] Crate initialized with CLI support
 
 ---
 *AI assisted*
