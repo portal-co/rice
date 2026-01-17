@@ -1,17 +1,29 @@
 # rice
 
-`rice` is a tool for "splicing" external files into a target file using special comment directives. It's designed to make it easy to manage components or dependencies within files, especially useful for AI agent context or project configuration.
+`rice` is a Rust library and CLI tool for "splicing" external files into a target file using special comment directives. It's designed to make it easy to manage components or dependencies within files, especially useful for AI agent context or project configuration.
 
 ## Features
 
 - **Directives**: Use `@path/to/file` to include a file's content.
 - **In-place updates**: Re-running `rice` updates the content between `[[begin path]]` and `[[end]]` markers.
 - **Extensible API**: Use the Rust library to implement custom resolution logic (e.g., fetching from URLs or databases).
+- **Comment-aware**: Markers can be wrapped in any comment style to match your file type.
 
 ## Installation
 
+### Binary
+
 ```bash
 cargo install --path .
+```
+
+### Library
+
+Add `rice` to your `Cargo.toml`:
+
+```toml
+[dependencies]
+rice = { git = "https://github.com/portal-co/rice.git" }
 ```
 
 ## CLI Usage
@@ -51,13 +63,6 @@ If you modify `utils.py` and run `rice main.py` again, the content between the `
 
 ## Library Usage
 
-Add `rice` to your `Cargo.toml`:
-
-```toml
-[dependencies]
-rice = { git = "https://github.com/portal-co/rice.git" }
-```
-
 ### Basic Splicing
 
 ```rust
@@ -92,6 +97,11 @@ impl Resolver for MyResolver {
 let mut output = Vec::new();
 splice_with("@virtual:hello", &mut output, MyResolver).unwrap();
 ```
+
+## Future Prospects
+
+- **File sections**: Splice specific marked sections from files rather than entire files, using similar marker syntax.
+- **Remote resources**: Resolve and splice content from URLs, databases, or other remote sources via custom resolvers.
 
 ---
 *AI assisted*
