@@ -8,9 +8,11 @@ repository = "https://github.com/portal-co/rice.git"
 
 [dependencies]
 clap = { version = "4.5.53", features = ["derive"], optional = true }
+zip = { version = "2", optional = true }
 
 [features]
 cli=["dep:clap"]
+zip=["dep:zip"]
 
 [[bin]]
 name = "rice"

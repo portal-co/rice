@@ -1,5 +1,8 @@
 use std::io::Write;
 
+#[cfg(feature = "zip")]
+use std::io::{Read, Seek};
+
 /// A trait for resolving inclusions.
 pub trait Resolver {
     fn resolve(&mut self, path: &str, out: &mut (dyn Write + '_)) -> std::io::Result<()>;
@@ -21,6 +24,31 @@ impl Resolver for FileResolver {
     fn resolve(&mut self, path: &str, out: &mut (dyn Write + '_)) -> std::io::Result<()> {
         if let Ok(mut f) = std::fs::File::open(path) {
             std::io::copy(&mut f, out)?;
+        }
+        Ok(())
+    }
+}
+
+/// Resolver that reads from a zip archive.
+#[cfg(feature = "zip")]
+pub struct ZipResolver<R: Read + Seek> {
+    archive: zip::ZipArchive<R>,
+}
+
+#[cfg(feature = "zip")]
+impl<R: Read + Seek> ZipResolver<R> {
+    pub fn new(reader: R) -> zip::result::ZipResult<Self> {
+        Ok(Self {
+            archive: zip::ZipArchive::new(reader)?,
+        })
+    }
+}
+
+#[cfg(feature = "zip")]
+impl<R: Read + Seek> Resolver for ZipResolver<R> {
+    fn resolve(&mut self, path: &str, out: &mut (dyn Write + '_)) -> std::io::Result<()> {
+        if let Ok(mut file) = self.archive.by_name(path) {
+            std::io::copy(&mut file, out)?;
         }
         Ok(())
     }
