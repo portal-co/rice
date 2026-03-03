@@ -11,11 +11,14 @@ clap = { version = "4.5.53", features = ["derive"], optional = true }
 zip = { version = "2", optional = true }
 
 embedded-io = "0.7.1"
-embedded-io-async = "0.7.1"
+embedded-io-async = "0.7.0"
+embedded-io-adapters = { version = "0.7.0", optional = true }
 
 [features]
-cli=["dep:clap"]
-zip=["dep:zip"]
+default = ["std"]
+std = ["embedded-io/std", "embedded-io-async/std", "dep:embedded-io-adapters", "embedded-io-adapters/std"]
+cli = ["dep:clap", "std"]
+zip = ["dep:zip", "std"]
 
 [[bin]]
 name = "rice"

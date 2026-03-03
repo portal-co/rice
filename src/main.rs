@@ -1,5 +1,5 @@
-use std::io::Write;
 use clap::Parser;
+use embedded_io_adapters::std::FromStd;
 
 /// Simple CLI to run rice::splice on a file in-place.
 #[derive(Debug, Parser)]
@@ -13,10 +13,11 @@ fn main() -> std::io::Result<()> {
     let args = Args::parse();
     let file = args.file;
     let s = std::fs::read_to_string(&file)?;
-    let mut file = std::fs::OpenOptions::new()
+    let raw = std::fs::OpenOptions::new()
         .write(true)
         .truncate(true)
         .open(&file)?;
+    let mut file = FromStd::new(raw);
     rice::splice(&s, &mut file)?;
     Ok(())
 }
