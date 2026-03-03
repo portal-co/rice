@@ -10,6 +10,9 @@ repository = "https://github.com/portal-co/rice.git"
 clap = { version = "4.5.53", features = ["derive"], optional = true }
 zip = { version = "2", optional = true }
 
+embedded-io = "0.7.1"
+embedded-io-async = "0.7.1"
+
 [features]
 cli=["dep:clap"]
 zip=["dep:zip"]
