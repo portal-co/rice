@@ -1,4 +1,10 @@
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
+
+#[cfg(feature = "std")]
+extern crate std;
+
+#[cfg(feature = "alloc")]
+extern crate alloc;
 
 #[cfg(feature = "zip")]
 use std::io::{Read, Seek};
@@ -10,11 +16,16 @@ use embedded_io::Write;
 // ---------------------------------------------------------------------------
 
 /// A stack-allocated string buffer capped at `N` bytes.
+///
+/// Only compiled when the `alloc` feature is not available; with `alloc` we
+/// use [`alloc::string::String`] instead.
+#[cfg(not(feature = "alloc"))]
 struct IStr<const N: usize> {
     buf: [u8; N],
     len: usize,
 }
 
+#[cfg(not(feature = "alloc"))]
 impl<const N: usize> IStr<N> {
     fn new() -> Self {
         Self { buf: [0u8; N], len: 0 }
@@ -38,7 +49,7 @@ impl<const N: usize> IStr<N> {
 }
 
 // ---------------------------------------------------------------------------
-// Internal helper: write a line + newline
+// Internal helpers: write a line + newline
 // ---------------------------------------------------------------------------
 
 fn write_line<W: Write + ?Sized>(out: &mut W, line: &str) -> Result<(), W::Error> {
@@ -174,12 +185,26 @@ where
         if let Some(path) = l.strip_prefix("@") {
             let path = path.trim();
 
-            // Build "[[begin <path>]]" without heap allocation
-            let mut marker: IStr<512> = IStr::new();
-            marker.push_str("[[begin ");
-            marker.push_str(path);
-            marker.push_str("]]");
-            write_line_bytes(file, marker.as_bytes())?;
+            // Build "[[begin <path>]]" — use String with `alloc`, or a
+            // fixed-capacity stack buffer without it.
+            #[cfg(feature = "alloc")]
+            {
+                let mut marker = alloc::string::String::with_capacity(
+                    "[[begin ]]".len() + path.len(),
+                );
+                marker.push_str("[[begin ");
+                marker.push_str(path);
+                marker.push_str("]]");
+                write_line_bytes(file, marker.as_bytes())?;
+            }
+            #[cfg(not(feature = "alloc"))]
+            {
+                let mut marker: IStr<512> = IStr::new();
+                marker.push_str("[[begin ");
+                marker.push_str(path);
+                marker.push_str("]]");
+                write_line_bytes(file, marker.as_bytes())?;
+            }
 
             resolver.resolve(path, file)?;
             write_line(file, "[[end]]")?;

@@ -16,7 +16,8 @@ embedded-io-adapters = { version = "0.7.0", optional = true }
 
 [features]
 default = ["std"]
-std = ["embedded-io/std", "embedded-io-async/std", "dep:embedded-io-adapters", "embedded-io-adapters/std"]
+alloc = ["embedded-io/alloc", "embedded-io-async/alloc"]
+std = ["alloc", "embedded-io/std", "embedded-io-async/std", "dep:embedded-io-adapters", "embedded-io-adapters/std"]
 cli = ["dep:clap", "std"]
 zip = ["dep:zip", "std"]
 
